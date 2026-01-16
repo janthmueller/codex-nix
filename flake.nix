@@ -8,8 +8,12 @@
 
   outputs = { self, nixpkgs, flake-utils }:
     let
+      channels = import ./channels.nix;
       overlay = final: prev: {
-        codex = final.callPackage ./package.nix { };
+        codex = final.callPackage ./package.nix channels.latest;
+        "codex-alpha" = final.callPackage ./package.nix channels.alpha;
+        "codex-beta" = final.callPackage ./package.nix channels.beta;
+        "codex-native" = final.callPackage ./package.nix channels.native;
       };
     in
     flake-utils.lib.eachDefaultSystem (system:
@@ -24,6 +28,9 @@
         packages = {
           default = pkgs.codex;
           codex = pkgs.codex;
+          alpha = pkgs."codex-alpha";
+          beta = pkgs."codex-beta";
+          native = pkgs."codex-native";
         };
         
         apps = {
@@ -34,6 +41,18 @@
           codex = {
             type = "app";
             program = "${pkgs.codex}/bin/codex";
+          };
+          alpha = {
+            type = "app";
+            program = "${pkgs."codex-alpha"}/bin/codex";
+          };
+          beta = {
+            type = "app";
+            program = "${pkgs."codex-beta"}/bin/codex";
+          };
+          native = {
+            type = "app";
+            program = "${pkgs."codex-native"}/bin/codex";
           };
         };
 

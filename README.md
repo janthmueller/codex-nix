@@ -1,8 +1,8 @@
-# codex-cli-nix
+# codex-nix
 
-Always up-to-date Nix package for [OpenAI Codex](https://github.com/openai/codex) - lightweight AI coding agent in your terminal.
+Always up-to-date Nix packages for [OpenAI Codex](https://github.com/openai/codex) - lightweight AI coding agent in your terminal.
 
-**🚀 Automatically updated hourly** to ensure you always have the latest Codex version.
+**🚀 Automatically updated hourly** to keep every Codex release channel fresh.
 
 ## Why this package?
 
@@ -15,6 +15,7 @@ This flake provides immediate access to the latest OpenAI Codex versions with:
 3. **Flake-First Design**: Direct flake usage with Cachix binary cache
 4. **Pre-built Binaries**: Multi-platform builds (Linux & macOS) cached for instant installation
 5. **Node.js 22 LTS**: Latest long-term support version for better performance and security
+6. **Release Channels**: Choose `latest`, `alpha`, `beta`, or `native` per install
 
 ### Why Not Just Use npm Global?
 
@@ -47,17 +48,25 @@ While `npm install -g @openai/codex` works, it has critical limitations:
 
 ```bash
 # Run Codex directly without installing
-nix run github:sadjow/codex-cli-nix
+nix run github:janthmueller/codex-nix
+
+# Run a specific channel
+nix run github:janthmueller/codex-nix#alpha
+nix run github:janthmueller/codex-nix#beta
+nix run github:janthmueller/codex-nix#native
 ```
 
 ### Install to Your System
 
 ```bash
 # Using nix profile (recommended for Nix 2.4+)
-nix profile install github:sadjow/codex-cli-nix
+nix profile install github:janthmueller/codex-nix
+
+# Or pick a channel
+nix profile install github:janthmueller/codex-nix#alpha
 
 # Or using nix-env (legacy)
-nix-env -if github:sadjow/codex-cli-nix
+nix-env -if github:janthmueller/codex-nix
 ```
 
 ### Optional: Enable Binary Cache for Faster Installation
@@ -68,8 +77,8 @@ To download pre-built binaries instead of compiling:
 # Install cachix if you haven't already
 nix-env -iA cachix -f https://cachix.org/api/v1/install
 
-# Add the codex-cli cache
-cachix use codex-cli
+# Add the codexxx cache
+cachix use codexxx
 ```
 
 Or add to your Nix configuration:
@@ -77,8 +86,8 @@ Or add to your Nix configuration:
 ```nix
 {
   nix.settings = {
-    substituters = [ "https://codex-cli.cachix.org" ];
-    trusted-public-keys = [ "codex-cli.cachix.org-1:YOUR_PUBLIC_KEY_HERE" ];
+    substituters = [ "https://codexxx.cachix.org" ];
+    trusted-public-keys = [ "codexxx.cachix.org-1:90TYFao2k7qqegESuMV/sJH4obGFSywWi8ZtTzLuQKE=" ];
   };
 }
 ```
@@ -91,10 +100,10 @@ Or add to your Nix configuration:
 {
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    codex-cli-nix.url = "github:sadjow/codex-cli-nix";
+    codex-nix.url = "github:janthmueller/codex-nix";
   };
 
-  outputs = { self, nixpkgs, codex-cli-nix }:
+  outputs = { self, nixpkgs, codex-nix }:
     let
       system = "x86_64-linux"; # or your system
       pkgs = nixpkgs.legacyPackages.${system};
@@ -102,11 +111,17 @@ Or add to your Nix configuration:
     {
       devShells.${system}.default = pkgs.mkShell {
         buildInputs = [
-          codex-cli-nix.packages.${system}.default
+          codex-nix.packages.${system}.default
         ];
       };
     };
 }
+```
+
+To pin a specific channel in your flake, reference it directly:
+
+```nix
+codex-nix.packages.${system}.alpha
 ```
 
 ### Using with NixOS
@@ -117,7 +132,7 @@ Add to your system configuration:
 { inputs, pkgs, ... }:
 {
   environment.systemPackages = [
-    inputs.codex-cli-nix.packages.${pkgs.system}.default
+    inputs.codex-nix.packages.${pkgs.system}.default
   ];
 }
 ```
@@ -130,7 +145,7 @@ Add to your Home Manager configuration:
 { inputs, pkgs, ... }:
 {
   home.packages = [
-    inputs.codex-cli-nix.packages.${pkgs.system}.default
+    inputs.codex-nix.packages.${pkgs.system}.default
   ];
 }
 ```
@@ -168,8 +183,8 @@ Currently using **Node.js 22 LTS** because:
 
 ```bash
 # Clone the repository
-git clone https://github.com/sadjow/codex-cli-nix
-cd codex-cli-nix
+git clone https://github.com/janthmueller/codex-nix
+cd codex-nix
 
 # Build locally
 nix build
@@ -185,11 +200,11 @@ nix develop
 
 ### Automated Updates
 
-This repository uses GitHub Actions to automatically check for new Codex versions hourly. When a new version is detected:
+This repository uses GitHub Actions to automatically check all Codex release channels hourly. When a new version is detected:
 
-1. A pull request is automatically created with the version update
-2. The tarball hash is automatically calculated
-3. Tests run on both Linux and macOS to verify the build
+1. A pull request is automatically created with the channel updates
+2. The tarball hashes are automatically calculated
+3. Tests run on both Linux and macOS to verify the builds
 4. The PR auto-merges if all checks pass
 
 The automated update workflow runs:
@@ -202,12 +217,11 @@ For manual updates:
 
 1. Check for new versions:
    ```bash
-   ./scripts/update.sh --check
+   ./scripts/update.sh --check --all
    ```
 2. Update to latest version:
    ```bash
-   # Get the latest version number from the check above
-   ./scripts/update.sh 0.30.0  # Replace with actual version
+   ./scripts/update.sh --all
    ```
 3. Test the build:
    ```bash
@@ -215,10 +229,33 @@ For manual updates:
    ./result/bin/codex --version
    ```
 
+### Release Channels (latest/alpha/beta/native)
+
+Codex publishes multiple npm dist-tags. This repo exposes them as separate flake outputs so users can pick a channel at install or runtime:
+
+If you omit the selector, you get `latest` by default.
+
+```bash
+# Run alpha without installing
+nix run github:janthmueller/codex-nix#alpha
+
+# Install beta to your profile
+nix profile install github:janthmueller/codex-nix#beta
+```
+
+Supported tags: `latest`, `alpha`, `beta`, `native`.
+
+If you only want to update one channel manually:
+
+```bash
+./scripts/update.sh --check --tag alpha
+./scripts/update.sh 0.87.0-alpha.1 --tag alpha
+```
+
 ### Push to Cachix manually
 ```bash
 nix build .#codex
-cachix push codex-cli ./result
+cachix push codexxx ./result
 ```
 
 ## Troubleshooting

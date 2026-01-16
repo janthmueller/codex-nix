@@ -27,11 +27,14 @@ jobs:
           
     - uses: cachix/cachix-action@v15
       with:
-        name: codex-cli
+        name: codexxx
         authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
         
     - name: Build codex
       run: |
         nix build .#codex
         nix build .#default
+        nix build .#alpha
+        nix build .#beta
+        nix build .#native
         # The cachix-action will automatically push the built derivations

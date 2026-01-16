@@ -45,7 +45,7 @@ This will allow the automated update workflow to:
 ================================================================
 
 After completing these steps, you can test the workflow by running:
-  gh workflow run "Update Claude Code Version"
+  gh workflow run "Check for Updates"
 
 EOF
 
@@ -66,7 +66,7 @@ This repository requires specific GitHub settings to enable automated updates.
    - Check **"Allow GitHub Actions to create and approve pull requests"**
 3. Click Save
 
-These settings allow the `update-claude-code.yml` workflow to:
+These settings allow the `update.yml` workflow to:
 - Modify files in the repository
 - Create pull requests for version updates
 - Update the flake.lock file
@@ -77,10 +77,10 @@ After configuring the settings, you can verify the workflow works by:
 
 ```bash
 # Manually trigger the update workflow
-gh workflow run "Update Claude Code Version"
+gh workflow run "Check for Updates"
 
 # Check the workflow status
-gh run list --workflow="Update Claude Code Version"
+gh run list --workflow="Check for Updates"
 ```
 
 ## Troubleshooting

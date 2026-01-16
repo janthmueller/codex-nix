@@ -3,15 +3,17 @@
 , fetchurl
 , nodejs_22
 , makeWrapper
+, version
+, sha256
 }:
 
 stdenv.mkDerivation rec {
   pname = "codex";
-  version = "0.86.0";
+  inherit version;
 
   src = fetchurl {
     url = "https://registry.npmjs.org/@openai/codex/-/codex-${version}.tgz";
-    sha256 = "17hcdh5mqbk8g8lss8pds3fyfldvf9hw3k75p1rbzng35nz3gl4k";
+    inherit sha256;
   };
 
   nativeBuildInputs = [ nodejs_22 makeWrapper ];
