@@ -44,7 +44,7 @@ update_channel() {
     local tag="$1"
     local version="$2"
     local hash="$3"
-    perl -0777 -i -pe "s/(${tag}\\s*=\\s*\\{\\s*version\\s*=\\s*\\\")[^\\\"]+(\\\";\\s*sha256\\s*=\\s*\\\")[^\\\"]+(\\\";)/\\1${version}\\2${hash}\\3/s" "$CHANNELS_FILE"
+    perl -0777 -i -pe "s/(${tag}\\s*=\\s*\\{\\s*version\\s*=\\s*\\\")[^\\\"]+(\\\";\\s*sha256\\s*=\\s*\\\")[^\\\"]+(\\\";)/\\g{1}${version}\\g{2}${hash}\\g{3}/s" "$CHANNELS_FILE"
 }
 
 TAG="$DEFAULT_TAG"
