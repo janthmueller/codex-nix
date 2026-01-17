@@ -55,7 +55,7 @@ pattern = re.compile(
     r"(\";)",
     re.S,
 )
-replacement = rf"\1{version}\2{sha256}\3"
+replacement = f"\\g<1>{version}\\g<2>{sha256}\\g<3>"
 new_data, count = pattern.subn(replacement, data, count=1)
 if count != 1:
     raise SystemExit(f"Error: could not update channel '{tag}' in {path}")
