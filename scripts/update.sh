@@ -35,6 +35,11 @@ get_latest_version() {
         sed -n 's/.*"version":"\([^"]*\)".*/\1/p'
 }
 
+sanitize_token() {
+    # Keep only safe printable characters to avoid control bytes in channels.nix.
+    printf '%s' "$1" | tr -cd 'A-Za-z0-9._-'
+}
+
 update_channel() {
     local tag="$1"
     local version="$2"
@@ -133,6 +138,7 @@ if [ "$ALL" = true ]; then
     for tag in "${TAGS[@]}"; do
         CURRENT_VERSION=$(get_current_version "$tag")
         LATEST_VERSION=$(get_latest_version "$tag")
+        LATEST_VERSION=$(sanitize_token "$LATEST_VERSION")
 
         if [ -z "$LATEST_VERSION" ]; then
             echo "Error: Could not fetch version for tag ${tag}"
@@ -147,6 +153,7 @@ if [ "$ALL" = true ]; then
         echo "Updating ${tag} to version ${LATEST_VERSION}..."
         URL="https://registry.npmjs.org/@openai/codex/-/codex-${LATEST_VERSION}.tgz"
         HASH=$(nix-prefetch-url "$URL" 2>/dev/null || echo "")
+        HASH=$(sanitize_token "$HASH")
 
         if [ -z "$HASH" ]; then
             echo "Error: Could not fetch hash for version $LATEST_VERSION (${tag})"
@@ -172,8 +179,10 @@ else
     echo "Updating ${TAG} to Codex CLI version $VERSION..."
 
     echo "Fetching SHA256 hash for version $VERSION..."
+    VERSION=$(sanitize_token "$VERSION")
     URL="https://registry.npmjs.org/@openai/codex/-/codex-${VERSION}.tgz"
     HASH=$(nix-prefetch-url "$URL" 2>/dev/null || echo "")
+    HASH=$(sanitize_token "$HASH")
 
     if [ -z "$HASH" ]; then
         echo "Error: Could not fetch hash for version $VERSION"
