@@ -5,8 +5,8 @@
   };
 
   alpha = {
-    version = "0.88.0-alpha.6";
-    sha256 = "06d8y5snhzcbrv47z5dcwvn8dc5wrmji93g5fpxwpkrfgc9ykiay";
+    version = "0.88.0-alpha.7";
+    sha256 = "1nnj7djq87qss8yj3v8vas3xvammgvv2p0mhk4jh9zg7lskmk6bc";
   };
 
   beta = {
