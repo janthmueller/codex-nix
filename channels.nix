@@ -1,7 +1,7 @@
 {
   latest = {
-    version = "0.90.0";
-    sha256 = "1mqyz6b0jxjdlf0lj1i9iygscpdpsyzd6p3cmgja3p1876lf4ibl";
+    version = "0.91.0";
+    sha256 = "0ah2jn73q5fkn829dndcvyzbwdzv0if1f253fvyf42x14mdxzzp3";
   };
 
   alpha = {
